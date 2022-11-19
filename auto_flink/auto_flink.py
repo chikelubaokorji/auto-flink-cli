@@ -45,7 +45,7 @@ def find_replace_yaml(file_path):
         f.close()
 
 
-def replace_placeholder_sh(file_path):
+def find_replace_sh(file_path):
     print("Editing Bash File: %s" % file_path)
     with open(file_path, 'r') as f:
         lines = f.readlines()
