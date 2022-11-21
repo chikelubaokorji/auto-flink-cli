@@ -26,17 +26,31 @@ def explode_dir(d_path):
     return arr_path
 
 
+def store_values(dictionary, key):
+    try:
+        value = dictionary[key]
+        print("The previously entered value for ''%s'' has been used for this similar placeholder." % key)
+        return value
+    except KeyError:
+        value = str(input("Enter value for %s:\n" % key)).replace(" ", "")
+        dictionary[key] = value
+        return value
+
+
 def find_replace_yaml(file_path):
+    param_dict = {}
     print("Editing YAML File: %s" % file_path)
     with open(file_path, 'r') as f:
         lines = f.readlines()
         for i in range(0, len(lines)):
-            p = re.compile(r'(.*?):\s\$\{')
+            regex_1 = r'(.*?):\s\$\{'
+            p = re.compile(regex_1)
             param = p.findall(lines[i])
             if not len(param) == 0:
-                replace_str = str(input("Enter value for %s:\n" % param[0]))
-                regex = r'\$\{.*?}'
-                new_line = re.sub(regex, replace_str, lines[i])
+                param_key = param[0]
+                param_value = store_values(param_dict, param_key)
+                regex_2 = r'\$\{.*?}'
+                new_line = re.sub(regex_2, param_value, lines[i])
                 lines[i] = new_line
         f.close()
     with open(file_path, 'w') as f:
@@ -46,6 +60,7 @@ def find_replace_yaml(file_path):
 
 
 def find_replace_sh(file_path):
+    param_dict = {}
     print("Editing Bash File: %s" % file_path)
     with open(file_path, 'r') as f:
         lines = f.readlines()
@@ -57,17 +72,17 @@ def find_replace_sh(file_path):
                 print("\nEditing placeholders in line: %s" % lines[i])
                 for j in range(0, len(param)):
                     if ':-${' in param[j]:
-                        replace_str = str(input("Enter value for %s:\n" % param[j].split(':-${')[1])).replace(" ", "")
-                        lines[i] = lines[i].replace('${' + param[j].split(':-${')[1] + '}', replace_str)
+                        param_key = param[j].split(':-${')[1]
+                        param_value = store_values(param_dict, param_key)
+                        lines[i] = lines[i].replace('${' + param_key + '}', param_value)
                     else:
                         if ':-' in param[j]:
                             pass
                             # Do something
                         else:
-                            print(param[j])
-                            replace_str = str(input("Enter value for %s:\n" % param[j])).replace(" ", "")
-                            lines[i] = lines[i].replace('${' + param[j] + '}', replace_str)
-                            print(lines[i])
+                            param_key = param[j]
+                            param_value = store_values(param_dict, param_key)
+                            lines[i] = lines[i].replace('${' + param_key + '}', param_value)
         f.close()
     with open(file_path, 'w') as f:
         f.writelines(lines)
