@@ -32,9 +32,11 @@ def store_values(dictionary, key):
         print("The previously entered value for ''%s'' has been used for this similar placeholder." % key)
         return value
     except KeyError:
-        value = str(input("Enter value for %s:\n" % key)).replace(" ", "")
-        dictionary[key] = value
-        return value
+        while True:
+            value = str(input("Enter value for %s:\n" % key)).replace(" ", "")
+            if value != '':
+                dictionary[key] = value
+                return value
 
 
 def find_replace_yaml(file_path):
